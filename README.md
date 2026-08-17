@@ -24,9 +24,9 @@ The system does not attempt to replace scientific literature databases or resear
 ## Architecture
 ChemScholarAI separates the system into two main stages:
 
-### 1. Scientific Literature Retrieval
+1. Scientific Literature Retrieval
 
-### 2. Retrieval-Augmented Generation
+2. Retrieval-Augmented Generation
 
 
 ```text
