@@ -21,7 +21,7 @@ The system does not attempt to replace scientific literature databases or resear
 
 ---
 
-# Architecture
+## Architecture
 ChemScholarAI separates the system into two main stages:
 
 ### 1. Scientific Literature Retrieval
@@ -72,16 +72,16 @@ ChemScholarAI separates the system into two main stages:
                                         ┌────────────────┐
                                         │ RAG Pipeline   │
                                         │                │
-                                        │ Retrieve      │
-                                        │ Build context │
-                                        │ Generate      │
+                                        │  Retrieve      │
+                                        │  Build context │
+                                        │  Generate      │
                                         └───────┬────────┘
                                                 │
                                                 ▼
                                  Grounded LLM Answer + citations
                                                 │
                                                 ▼
-                                 every interaction logged to Postgres (query, answer, sources, feedback)
+        every interaction logged to Postgres (query, answer, sources, feedback)
 ```
 
 ---
@@ -90,7 +90,7 @@ Retrieval and metadata are deliberately split: **Postgres** owns the paper data 
 
 ---
 
-# Why SPECTER2?
+## Why SPECTER2?
 
 A general-purpose sentence embedding model is not necessarily optimal for scientific literature.
 
@@ -107,7 +107,7 @@ Abstract
 The resulting embedding captures the paper's semantic representation and allows research questions to be compared against scientific publications in vector space.
 
 ---
-# Project Structure
+## Project Structure
 
 ```text
 .
@@ -136,7 +136,7 @@ The resulting embedding captures the paper's semantic representation and allows 
 ```
 
 
-# Technology Stack
+## Technology Stack
 
 | Component             | Technology               | Purpose                            |
 | --------------------- | ------------------------ | ---------------------------------- |
@@ -152,38 +152,40 @@ The resulting embedding captures the paper's semantic representation and allows 
 | Package management    | uv                       | Python dependency management       |
 
 ---
-# Current Data Pipeline
+## Current Data Pipeline
 
-## 1. Literature Ingestion 
+### 1. Literature Ingestion 
 
 **Fetch** - queries the arXiv API (default categories `physics.chem-ph`, `cond-mat.mtrl-sci`), pulling title, abstract, authors, categories, dates, and PDF link. PDFs themselves aren't downloaded at this stage — the link is enough for a user to open the source.
+
 ---
 
-## 2. Domain Filtering
+### 2. Domain Filtering
 
 **Filter** - a lightweight keyword filter (DFT, Hartree-Fock, ab initio, CCSD, molecular dynamics, potential energy surface, etc.) decides which results are actually computational chemistry, recording a `keyword_score` and `matched_keywords`. This stays separate from semantic retrieval so it can be swapped for a proper classifier later without touching anything else.
 
 ---
 
-## 3. — Metadata Storage
+### 3. Metadata Storage
 
 **Store** - filtered papers are upserted into PostgreSQL, keyed by `arxiv_id`, so repeated ingestion runs never create duplicates.
 
 ---
 
-## 4. — Scientific Embeddings
+### 4. Scientific Embeddings
 
 **Embed** — SPECTER2 converts each paper's `title + abstract` into a vector, stored in FAISS with the same integer id as its Postgres row. These vectors are stored in db for semantic similarity search.
 
 ---
 
-# 5. — Retrieval
+### 5. Retrieval
 **Retrieve** — a user's question is embedded with the same model (via a separate query-tuned adapter), compared against FAISS, and the top-k paper ids are hydrated back into full metadata from Postgres.
 
 ---
 
-# 6. — Generation
+### 6. Generation
 **Generate** — retrieved papers are assembled into a numbered context block (`[1]`, `[2]`, `[3]`...) and handed to the LLM with instructions to answer only from that context, citing sources inline.
+
 ---
 
 ## Prerequisites
