@@ -113,7 +113,6 @@ The resulting embedding captures the paper's semantic representation and allows 
 .
 ├── app.py                        # Streamlit UI (Ask tab, feedback buttons)
 ├── store_embeddings.py           # Step 2 entry point: Postgres + FAISS ingestion
-├── verify_pipeline.py            # diagnostics: row counts, round-trip test, sample query
 ├── config.py                     # typed settings, loaded from .env via pydantic-settings
 ├── filtering_topic.py            # keyword filter deciding which arXiv results are "comp chem"
 ├── fetch/
@@ -225,7 +224,6 @@ cp .env.example .env
 uv sync
 uv run python fetch/arxiv_fetch.py       # Step 1: fetch papers into papers.jsonl
 uv run python store_embeddings.py        # Step 2: load into Postgres, embed, index in FAISS
-uv run python verify_pipeline.py         # optional: sanity-check the pipeline
 uv run streamlit run app.py
 ```
 
